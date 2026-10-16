@@ -1,0 +1,543 @@
+{
+  "name": "Smart_Lead_Management_System",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "f2f03ad6-7719-46c9-a0af-6dc5ca9ac0a2",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "16u5eJtfV29kTDaJeA-yWKWNWOApMtFCEfnfUaHlwVgA",
+          "mode": "list",
+          "cachedResultName": "Smart_Lead_Management_System",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16u5eJtfV29kTDaJeA-yWKWNWOApMtFCEfnfUaHlwVgA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1909153257,
+          "mode": "list",
+          "cachedResultName": "Leads",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16u5eJtfV29kTDaJeA-yWKWNWOApMtFCEfnfUaHlwVgA/edit#gid=1909153257"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        0
+      ],
+      "id": "e9fe6864-f91c-474a-834f-9b64c10943e2",
+      "name": "Get row(s) in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ffC3RsOLCl2eWRAd",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c354c7d6-fcc5-4fb2-9324-bc40b298e888",
+              "leftValue": "={{ $json.Status }}",
+              "rightValue": "Active",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "9f7a0dc6-641b-42c7-8dc5-3bb2d5cbfa53",
+              "leftValue": "={{ $json.Budget }}",
+              "rightValue": 20000,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "id": "c5b924a3-2685-4b32-b76d-2e4854de9c90",
+              "leftValue": "={{ $json.Name }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "0049b79b-1a19-4ec6-a0d2-bfbe1b5314f3",
+              "leftValue": "={{ $json.Email }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        448,
+        0
+      ],
+      "id": "ea463bd2-6a48-42c5-b378-6c7890213386",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e25bdc2b-a416-4f49-a7a2-f91700bf6c08",
+              "name": "Lead_ID",
+              "value": "={{ $json.Lead_ID }}",
+              "type": "string"
+            },
+            {
+              "id": "c199de7e-bc10-46cd-9bcb-fdd5bdb4c8b6",
+              "name": "Name",
+              "value": "={{ $json.Name }}",
+              "type": "string"
+            },
+            {
+              "id": "84728d35-1c4f-423e-9dbd-548a012e2cbf",
+              "name": "Email",
+              "value": "={{ $json.Email }}",
+              "type": "string"
+            },
+            {
+              "id": "0c61b39e-a5bf-4cfc-973b-8e24f79c8188",
+              "name": "Company",
+              "value": "={{ $json.Company }}",
+              "type": "string"
+            },
+            {
+              "id": "139ae735-cea9-479b-b5dc-9c77b37e15de",
+              "name": "Budget",
+              "value": "={{ $json.Budget }}",
+              "type": "number"
+            },
+            {
+              "id": "a43b0f28-0abd-4235-8dfc-d7984fb80f8c",
+              "name": "Service",
+              "value": "={{ $json.Service }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        672,
+        0
+      ],
+      "id": "7b645702-4d4d-4e53-9477-b0096061e9f0",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.Email }}",
+        "subject": "=Welcome {{ $json.Name }} - Details regarding {{ $json.Service }}",
+        "message": "=Hi {{ $json.Name }},  Thank you for reaching out from {{ $json.Company }}. We have received your request for {{ $json.Service }} (Budget: ${{$json.Budget }}).  Our team will get back to you shortly with next steps.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        944,
+        -272
+      ],
+      "id": "c2acfe09-c350-4d31-b928-8a9953deb969",
+      "name": "Send a message",
+      "webhookId": "747a9fab-4635-412f-ae5e-115bd5f88a99",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "7FBD2v75MGfplf86",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "aggregation": "append",
+              "field": "Lead_ID",
+              "includeEmpty": true
+            },
+            {
+              "aggregation": "append",
+              "field": "Name",
+              "includeEmpty": true
+            },
+            {
+              "aggregation": "append",
+              "field": "Email",
+              "includeEmpty": true
+            },
+            {
+              "aggregation": "append",
+              "field": "Company",
+              "includeEmpty": true
+            },
+            {
+              "aggregation": "append",
+              "field": "Budget",
+              "includeEmpty": true
+            },
+            {
+              "aggregation": "append",
+              "field": "Service",
+              "includeEmpty": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1.1,
+      "position": [
+        944,
+        0
+      ],
+      "id": "03623849-e284-4730-b887-533397c6f9ec",
+      "name": "Summarize"
+    },
+    {
+      "parameters": {
+        "sendTo": "staha5958@gmail.com",
+        "subject": "[Daily Report] Smart Lead Processing Summary",
+        "message": "==<div style=\"font-family: Segoe UI, Tahoma, Geneva, Verdana, sans-serif; color: #222; max-width: 600px; margin: 0 auto; border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden;\">\n  <div style=\"background-color: #1a73e8; color: #ffffff; padding: 16px 20px;\">\n    <h2 style=\"margin: 0; font-size: 20px;\">📊 Daily Lead Automation Report</h2>\n  </div>\n  \n  <div style=\"padding: 20px;\">\n    <p style=\"margin-top: 0;\">Hello Admin,</p>\n    <p>Here is the automated summary of processed leads for today:</p>\n    \n    {{\n      (() => {\n        // دالة تنظيف وتوحيد شكل البيانات إلى مصفوفة\n        const cleanData = (field) => {\n          if (!field) return [];\n          if (Array.isArray(field)) return field.flatMap(item => typeof item === 'string' ? item.split(',') : item).map(s => String(s).trim());\n          if (typeof field === 'string') return field.split(',').map(s => s.trim());\n          return [field];\n        };\n\n        const ids = cleanData($json.appended_Lead_ID);\n        const names = cleanData($json.appended_Name);\n        const companies = cleanData($json.appended_Company);\n        const services = cleanData($json.appended_Service);\n        const budgets = cleanData($json.appended_Budget);\n        const emails = cleanData($json.appended_Email);\n\n        const totalLeads = names.length;\n\n        let tableRows = '';\n        for (let i = 0; i < totalLeads; i++) {\n          tableRows += `\n            <tr style=\"border-bottom: 1px solid #eee;\">\n              <td style=\"padding: 10px; font-weight: bold; color: #555;\">${ids[i] || 'N/A'}</td>\n              <td style=\"padding: 10px;\">${names[i] || 'N/A'}</td>\n              <td style=\"padding: 10px;\">${companies[i] || 'N/A'}</td>\n              <td style=\"padding: 10px;\">${services[i] || 'N/A'}</td>\n              <td style=\"padding: 10px; color: #2e7d32; font-weight: bold;\">$${budgets[i] || '0'}</td>\n              <td style=\"padding: 10px;\">${emails[i] || 'N/A'}</td>\n            </tr>\n          `;\n        }\n\n        return `\n          <div style=\"background-color: #f0f4f9; padding: 10px 15px; border-radius: 6px; margin-bottom: 15px; font-weight: bold; color: #1a73e8;\">\n            Total Processed Leads: ${totalLeads}\n          </div>\n\n          <table style=\"width: 100%; border-collapse: collapse; text-align: left; font-size: 14px;\">\n            <thead>\n              <tr style=\"background-color: #f8f9fa; border-bottom: 2px solid #ddd;\">\n                <th style=\"padding: 10px;\">ID</th>\n                <th style=\"padding: 10px;\">Name</th>\n                <th style=\"padding: 10px;\">Company</th>\n                <th style=\"padding: 10px;\">Service</th>\n                <th style=\"padding: 10px;\">Budget</th>\n                <th style=\"padding: 10px;\">Email</th>\n              </tr>\n            </thead>\n            <tbody>\n              ${tableRows}\n            </tbody>\n          </table>\n        `;\n      })()\n    }}\n\n    <br />\n    <p style=\"font-size: 12px; color: #777; border-top: 1px solid #eee; padding-top: 10px; margin-bottom: 0;\">\n      Automatic confirmation emails have been sent to all corresponding leads.\n    </p>\n  </div>\n</div>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1168,
+        0
+      ],
+      "id": "5a7aa29a-1077-4bf9-a372-d9e5bfe128ab",
+      "name": "Send a message1",
+      "webhookId": "7f9fc662-62dd-4ffb-9923-1668b3eafcb8",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "7FBD2v75MGfplf86",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "batchSize": 10,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        944,
+        288
+      ],
+      "id": "1d272296-a6cc-4702-a5dd-366d722ea7e8",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "16u5eJtfV29kTDaJeA-yWKWNWOApMtFCEfnfUaHlwVgA",
+          "mode": "list",
+          "cachedResultName": "Smart_Lead_Management_System",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16u5eJtfV29kTDaJeA-yWKWNWOApMtFCEfnfUaHlwVgA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1087746788,
+          "mode": "list",
+          "cachedResultName": "Read Me",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16u5eJtfV29kTDaJeA-yWKWNWOApMtFCEfnfUaHlwVgA/edit#gid=1087746788"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Lead_ID": "={{ $json.Lead_ID }}",
+            "Name": "={{ $json.Name }}",
+            "Email": "={{ $json.Email }}",
+            "Company": "={{ $json.Company }}",
+            "Status": "Processed",
+            "Budget": "={{ $json.Budget }}",
+            "Service": "={{ $json.Service }}",
+            "Processed_Date": "={{ $now }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Lead_ID",
+              "displayName": "Lead_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Name",
+              "displayName": "Name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Email",
+              "displayName": "Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Company",
+              "displayName": "Company",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Budget",
+              "displayName": "Budget",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Service",
+              "displayName": "Service",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Processed_Date",
+              "displayName": "Processed_Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1184,
+        400
+      ],
+      "id": "214d7fee-8dbc-4a07-a365-e589a230da27",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ffC3RsOLCl2eWRAd",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0C7JD6QGQP",
+          "mode": "list",
+          "cachedResultName": "team"
+        },
+        "text": "All leads processed successfully",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.7,
+      "position": [
+        1168,
+        192
+      ],
+      "id": "5bffe8d0-4987-4eea-b312-2f952f75a379",
+      "name": "Send a message2",
+      "webhookId": "7914f5b8-8905-43f4-9086-453cf18f9eb6",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "3uHAdzHFUAEAJkKJ",
+          "name": "Slack account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Summarize",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize": {
+      "main": [
+        [
+          {
+            "node": "Send a message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Send a message2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true
+  },
+  "versionId": "2c91e88e-d04c-4306-8cab-e1e53edc8a89",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c8c075491b060f05e849ac6c592088dce67f607008aacbcde34097e83851498b"
+  },
+  "nodeGroups": [],
+  "id": "2pgdzaV1deFbkPnt",
+  "tags": []
+}
